@@ -54,7 +54,6 @@ public class SprintIssue extends GreenHopperIssue {
         epic = Field.getString(map.get("epic"));
         estimateStatistic = GreenHopperField.getEstimateStatistic(map.get("estimateStatistic"));
         trackingStatistic = GreenHopperField.getEstimateStatistic(map.get("trackingStatistic"));
-        System.out.println(trackingStatistic);
     }
 
     public String getEpic() {
