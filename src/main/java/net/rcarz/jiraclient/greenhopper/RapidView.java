@@ -19,13 +19,15 @@
 
 package net.rcarz.jiraclient.greenhopper;
 
-import net.rcarz.jiraclient.Field;
-import net.rcarz.jiraclient.JiraException;
-import net.rcarz.jiraclient.RestClient;
-
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.rcarz.jiraclient.Field;
+import net.rcarz.jiraclient.JiraException;
+import net.rcarz.jiraclient.RestClient;
 import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -53,7 +55,7 @@ public class RapidView extends GreenHopperResource {
     }
 
     private void deserialise(JSONObject json) {
-        Map map = json;
+        Map<?, ?> map = json;
 
         id = Field.getInteger(map.get("id"));
         name = Field.getString(map.get("name"));
@@ -147,12 +149,54 @@ public class RapidView extends GreenHopperResource {
         if (!jo.containsKey("sprints") || !(jo.get("sprints") instanceof JSONArray))
             throw new JiraException("Sprints result is malformed");
 
-        return GreenHopperField.getResourceArray(
+        List<Sprint> sprints = GreenHopperField.getResourceArray(
             Sprint.class,
             jo.get("sprints"),
             restclient
         );
+        
+        return getSprintsWithIssues(sprints);
     }
+
+	private List<Sprint> getSprintsWithIssues(List<Sprint> sprints) throws JiraException {
+		List<Sprint> spintsWithIssues = new ArrayList<Sprint>();
+        
+		try {
+			for (Sprint sprint : sprints) {
+              	Map<String, String> parameters = new HashMap<String, String>();
+              	parameters.put("rapidViewId", String.valueOf(id));
+              	parameters.put("sprintId", String.valueOf(sprint.getId()));
+              	
+              	URI uri = restclient.buildURI(RESOURCE_URI + "rapid/charts/sprintreport", parameters);
+              	
+              	JSONObject json = (JSONObject) restclient.get(uri);
+              	
+              	Sprint sprintWithIssue = GreenHopperField.getResource(Sprint.class, json.get("sprint"), restclient);
+              	JSONObject content = (JSONObject) json.get("contents");
+              	
+                List<SprintIssue> incomplete = GreenHopperField.getResourceArray(
+                		SprintIssue.class,
+                        content.get("incompletedIssues"),
+                        restclient
+                );
+                
+                List<SprintIssue> complete = GreenHopperField.getResourceArray(
+                		SprintIssue.class,
+                        content.get("completedIssues"),
+                        restclient
+                );
+              	
+                sprintWithIssue.getIssues().addAll(incomplete);
+                sprintWithIssue.getIssues().addAll(complete);
+                
+                spintsWithIssues.add(sprintWithIssue);
+			}
+  		} catch (Exception e) {
+  			throw new JiraException("SprintsIssues result is malformed");
+  		}
+
+		return spintsWithIssues;
+	}
 
     /**
      * Retrieves the sprint report for the given sprint.
@@ -194,5 +238,6 @@ public class RapidView extends GreenHopperResource {
     public Boolean isSprintSupportEnabled() {
         return sprintSupportEnabled;
     }
+    
 }
 

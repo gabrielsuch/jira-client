@@ -33,6 +33,7 @@ public class SprintIssue extends GreenHopperIssue {
 
     private String epic = null;
     private EstimateStatistic estimateStatistic = null;
+    private EstimateStatistic trackingStatistic = null;
 
     /**
      * Creates a sprint issue from a JSON payload.
@@ -48,10 +49,12 @@ public class SprintIssue extends GreenHopperIssue {
     }
 
     private void deserialise(JSONObject json) {
-        Map map = json;
+        Map<?, ?> map = json;
 
         epic = Field.getString(map.get("epic"));
         estimateStatistic = GreenHopperField.getEstimateStatistic(map.get("estimateStatistic"));
+        trackingStatistic = GreenHopperField.getEstimateStatistic(map.get("trackingStatistic"));
+        System.out.println(trackingStatistic);
     }
 
     public String getEpic() {
@@ -61,5 +64,9 @@ public class SprintIssue extends GreenHopperIssue {
     public EstimateStatistic getEstimateStatistic() {
         return estimateStatistic;
     }
+    
+    public EstimateStatistic getTrackingStatistic() {
+		return trackingStatistic;
+	}
+    
 }
-
