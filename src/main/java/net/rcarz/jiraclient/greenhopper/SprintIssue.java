@@ -31,41 +31,43 @@ import net.sf.json.JSONObject;
  */
 public class SprintIssue extends GreenHopperIssue {
 
-    private String epic = null;
-    private EstimateStatistic estimateStatistic = null;
-    private EstimateStatistic trackingStatistic = null;
+	private String epic = null;
+	private EstimateStatistic estimateStatistic = null;
+	private EstimateStatistic trackingStatistic = null;
 
-    /**
-     * Creates a sprint issue from a JSON payload.
-     *
-     * @param restclient REST client instance
-     * @param json JSON payload
-     */
-    protected SprintIssue(RestClient restclient, JSONObject json) {
-        super(restclient, json);
+	/**
+	 * Creates a sprint issue from a JSON payload.
+	 * 
+	 * @param restclient
+	 *            REST client instance
+	 * @param json
+	 *            JSON payload
+	 */
+	protected SprintIssue(RestClient restclient, JSONObject json) {
+		super(restclient, json);
 
-        if (json != null)
-            deserialise(json);
-    }
+		if (json != null)
+			deserialise(json);
+	}
 
-    private void deserialise(JSONObject json) {
-        Map<?, ?> map = json;
+	private void deserialise(JSONObject json) {
+		Map<?, ?> map = json;
 
-        epic = Field.getString(map.get("epic"));
-        estimateStatistic = GreenHopperField.getEstimateStatistic(map.get("estimateStatistic"));
-        trackingStatistic = GreenHopperField.getEstimateStatistic(map.get("trackingStatistic"));
-    }
+		epic = Field.getString(map.get("epic"));
+		estimateStatistic = GreenHopperField.getEstimateStatistic(map.get("estimateStatistic"));
+		trackingStatistic = GreenHopperField.getEstimateStatistic(map.get("trackingStatistic"));
+	}
 
-    public String getEpic() {
-        return epic;
-    }
+	public String getEpic() {
+		return epic;
+	}
 
-    public EstimateStatistic getEstimateStatistic() {
-        return estimateStatistic;
-    }
-    
-    public EstimateStatistic getTrackingStatistic() {
+	public EstimateStatistic getEstimateStatistic() {
+		return estimateStatistic;
+	}
+
+	public EstimateStatistic getTrackingStatistic() {
 		return trackingStatistic;
 	}
-    
+
 }
